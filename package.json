@@ -1,0 +1,17 @@
+{
+  "name": "irisu-control",
+  "version": "1.0.0",
+  "description": "Multi-project npm script runner with grouping",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev"
+  },
+  "keywords": ["electron", "npm", "scripts", "multi-project"],
+  "author": "",
+  "license": "MIT",
+  "type": "commonjs",
+  "devDependencies": {
+    "electron": "^39.2.2"
+  }
+}
