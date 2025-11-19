@@ -22,6 +22,7 @@
   "build": {
     "appId": "com.danko.irisucontrol",
     "productName": "IrisuControl",
+    "icon": "resources/icons/logo.png",
     "directories": {
       "output": "release"
     },
