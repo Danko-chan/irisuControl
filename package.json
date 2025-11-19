@@ -5,13 +5,48 @@
   "main": "src/main/main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "electron . --dev"
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:linux": "electron-builder --linux"
   },
-  "keywords": ["electron", "npm", "scripts", "multi-project"],
+  "keywords": [
+    "electron",
+    "npm",
+    "scripts",
+    "multi-project"
+  ],
   "author": "",
   "license": "MIT",
   "type": "commonjs",
+  "build": {
+    "appId": "com.danko.irisucontrol",
+    "productName": "IrisuControl",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "src/**/*",
+      "index.html",
+      "renderer.js",
+      "styles/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "tar.gz"
+      ],
+      "category": "Utility"
+    }
+  },
   "devDependencies": {
-    "electron": "^39.2.2"
+    "electron": "^39.2.2",
+    "electron-builder": "^25.0.0"
   }
 }

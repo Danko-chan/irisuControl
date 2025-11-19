@@ -1,6 +1,18 @@
-/node_modules
-/dist
-/build
-/.vscode
-/.idea
-/.DS_Store 
+# Build output
+release/
+dist/
+linux-unpacked/
+win-unpacked/
+mac-unpacked/
+
+# AppImages, tarballs, installers
+*.AppImage
+*.tar.gz
+*.deb
+*.rpm
+*.snap
+*.exe
+*.msi
+
+# Node modules
+node_modules/
