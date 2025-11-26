@@ -5,10 +5,12 @@
   "main": "src/main/main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "electron . --dev",
-    "build": "electron-builder",
-    "build:win": "electron-builder --win",
-    "build:linux": "electron-builder --linux"
+    "dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron . --dev\"",
+    "build": "vite build && electron-builder",
+    "build:win": "vite build && electron-builder --win",
+    "build:linux": "vite build && electron-builder --linux",
+    "vite:dev": "vite",
+    "vite:build": "vite build"
   },
   "keywords": [
     "electron",
@@ -16,21 +18,24 @@
     "scripts",
     "multi-project"
   ],
-  "author": "",
+  "author": "Danko-chan",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Danko-chan/irisuControl.git"
+  },
   "type": "commonjs",
   "build": {
     "appId": "com.danko.irisucontrol",
     "productName": "IrisuControl",
-    "icon": "resources/icons/logo.png",
+    "icon": "resources/icons/icon.png",
     "directories": {
       "output": "release"
     },
     "files": [
-      "src/**/*",
-      "index.html",
-      "renderer.js",
-      "styles/**/*",
+      "src/main/**/*",
+      "src/preload/**/*",
+      "dist/renderer/**/*",
       "package.json"
     ],
     "win": {
@@ -46,8 +51,18 @@
       "category": "Utility"
     }
   },
+  "dependencies": {
+    "preact": "^10.24.3"
+  },
   "devDependencies": {
+    "@preact/preset-vite": "^2.9.2",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^9.1.2",
     "electron": "^39.2.2",
-    "electron-builder": "^25.0.0"
+    "electron-builder": "^25.0.0",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "vite": "^6.0.7",
+    "wait-on": "^8.0.1"
   }
 }

@@ -4,13 +4,15 @@ const path = require('path');
 let mainWindow;
 
 function createWindow() {
+  const iconPath = path.join(__dirname, '../../resources/icons/icon.png');
+
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 850,
     minWidth: 1000,
     minHeight: 600,
     backgroundColor: '#0a0a0a',
-    icon: path.join(__dirname, '../../resources/icons/logo.png'),
+    icon: iconPath,
     webPreferences: {
       preload: path.join(__dirname, '../preload/preload.js'),
       contextIsolation: true,
@@ -18,10 +20,17 @@ function createWindow() {
     }
   });
 
-  mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
-  
-  // Uncomment for debugging
-  // mainWindow.webContents.openDevTools();
+  const isDev = process.argv.includes('--dev');
+
+  if (isDev) {
+    // Load from Vite dev server
+    mainWindow.loadURL('http://localhost:5173');
+    mainWindow.webContents.openDevTools();
+  } else {
+    // Load from built files
+    mainWindow.loadFile(path.join(__dirname, '../../dist/renderer/index.html'));
+  }
+
 }
 
 function getMainWindow() {
@@ -30,10 +39,11 @@ function getMainWindow() {
 
 app.whenReady().then(() => {
   createWindow();
-  
+
   // Import IPC handlers after window is created
   require('./ipc/projects-ipc');
   require('./ipc/processes-ipc');
+  require('./ipc/logs-ipc');
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

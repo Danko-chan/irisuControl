@@ -54,3 +54,33 @@ ipcMain.handle('groups:toggle-collapsed', async (_event, groupId) => {
 ipcMain.handle('groups:get-collapsed', async () => {
   return projectsService.getGroupsCollapsed();
 });
+
+ipcMain.handle('projects:add-by-path', async (_event, folderPath) => {
+  return projectsService.addProject(folderPath);
+});
+
+ipcMain.handle('recent-projects:get-all', async () => {
+  const recentProjectsStore = require('../storage/recentProjectsStore');
+  return recentProjectsStore.getRecentProjects();
+});
+
+ipcMain.handle('recent-projects:track', async (_event, projectPath, projectName) => {
+  const recentProjectsStore = require('../storage/recentProjectsStore');
+  recentProjectsStore.addProject(projectPath, projectName);
+  return { success: true };
+});
+
+ipcMain.handle('favorites:get-all', async () => {
+  const favoritesStore = require('../storage/favoritesStore');
+  return favoritesStore.getFavorites();
+});
+
+ipcMain.handle('favorites:toggle', async (_event, projectPath, projectName, scriptName) => {
+  const favoritesStore = require('../storage/favoritesStore');
+  return favoritesStore.toggleFavorite(projectPath, projectName, scriptName);
+});
+
+ipcMain.handle('favorites:is-favorite', async (_event, projectPath, scriptName) => {
+  const favoritesStore = require('../storage/favoritesStore');
+  return favoritesStore.isFavorite(projectPath, scriptName);
+});

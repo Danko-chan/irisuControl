@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { loadData, saveData } = require('../storage/projectsStore');
+const recentProjectsStore = require('../storage/recentProjectsStore');
 
 function getAllProjects() {
   const data = loadData();
@@ -29,7 +30,7 @@ function toggleGroupCollapsed(groupId) {
 
 function addProject(dirPath) {
   const pkgPath = path.join(dirPath, 'package.json');
-  
+
   if (!fs.existsSync(pkgPath)) {
     return { success: false, error: 'No package.json in this folder' };
   }
@@ -43,19 +44,24 @@ function addProject(dirPath) {
 
   const data = loadData();
   const exists = data.projects.find(p => p.path === dirPath);
-  
+
   if (exists) {
     return { success: false, error: 'Project already exists' };
   }
 
-  data.projects.push({
+  const newProject = {
     id: `proj_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     name: pkg.name || path.basename(dirPath),
     path: dirPath,
     groupId: null
-  });
+  };
 
+  data.projects.push(newProject);
   saveData(data);
+
+  // Add to recent projects
+  recentProjectsStore.addProject(newProject.path, newProject.name);
+
   return { success: true };
 }
 
