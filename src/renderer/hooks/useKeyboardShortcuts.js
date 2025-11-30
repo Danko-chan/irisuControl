@@ -80,7 +80,16 @@ export function useKeyboardShortcuts(handlers) {
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [handlers]);
+    }, [
+        handlers.onSearch,
+        handlers.onAddProject,
+        handlers.onCloseTab,
+        handlers.onNewGroup,
+        handlers.onExportLogs,
+        handlers.onShowHelp,
+        handlers.onSwitchTab,
+        handlers.onEscape
+    ]);
 
     // Helper function to get the modifier key name for display
     const getModifierKey = () => {
