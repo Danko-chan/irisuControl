@@ -34,15 +34,15 @@ function getShellPreference() {
 
 function runScript(projectPath, scriptName, projectName, shell, onLog, onExit) {
   const id = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  
+
   const shellToUse = shell || getShellPreference();
   const platform = os.platform();
-  
+
   // Construct the command to run the npm script
   const npmCommand = `npm run ${scriptName}`;
-  
+
   let child;
-  
+
   // Spawn the process with proper shell handling
   if (platform === 'win32') {
     // Windows
@@ -56,7 +56,7 @@ function runScript(projectPath, scriptName, projectName, shell, onLog, onExit) {
     // Unix-like (Linux, macOS)
     child = spawn(shellToUse, ['-c', npmCommand], {
       cwd: projectPath,
-      env: { 
+      env: {
         ...process.env,
         FORCE_COLOR: '1',  // Enable colors in output
         NPM_CONFIG_COLOR: 'always'
@@ -102,7 +102,7 @@ function stopProcess(id) {
   const entry = runningProcesses.get(id);
   if (entry) {
     const platform = os.platform();
-    
+
     // On Unix-like systems, kill the entire process group
     if (platform !== 'win32') {
       try {
@@ -121,7 +121,7 @@ function stopProcess(id) {
         }
       });
     }
-    
+
     runningProcesses.delete(id);
     return { success: true };
   }
@@ -143,8 +143,9 @@ function getAllRunningProcesses() {
 
 function getAvailableShells() {
   const platform = os.platform();
+  const fs = require('fs');
   const shells = [];
-  
+
   if (platform === 'win32') {
     shells.push(
       { name: 'Command Prompt', value: 'cmd.exe' },
@@ -155,26 +156,44 @@ function getAvailableShells() {
       shells.push({ name: 'System Default', value: process.env.COMSPEC });
     }
   } else {
-    // Unix-like systems
-    const commonShells = [
-      { name: 'Bash', value: '/bin/bash' },
-      { name: 'Zsh', value: '/bin/zsh' },
-      { name: 'Fish', value: '/usr/bin/fish' },
-      { name: 'Dash', value: '/bin/dash' },
-      { name: 'Sh', value: '/bin/sh' }
+    // Unix-like systems - check both /bin and /usr/bin
+    const potentialShells = [
+      { name: 'Bash', paths: ['/bin/bash', '/usr/bin/bash'] },
+      { name: 'Zsh', paths: ['/bin/zsh', '/usr/bin/zsh'] },
+      { name: 'Fish', paths: ['/usr/bin/fish', '/bin/fish'] },
+      { name: 'Dash', paths: ['/bin/dash', '/usr/bin/dash'] },
+      { name: 'Sh', paths: ['/bin/sh', '/usr/bin/sh'] }
     ];
-    
-    // Add system default if different
-    if (process.env.SHELL) {
-      const systemShell = { name: 'System Default', value: process.env.SHELL };
-      if (!commonShells.find(s => s.value === process.env.SHELL)) {
-        shells.push(systemShell);
+
+    // Add system default first if available
+    if (process.env.SHELL && fs.existsSync(process.env.SHELL)) {
+      shells.push({ name: 'System Default', value: process.env.SHELL });
+    }
+
+    // Check which shells actually exist
+    for (const shell of potentialShells) {
+      for (const shellPath of shell.paths) {
+        try {
+          if (fs.existsSync(shellPath)) {
+            // Only add if not already added as system default
+            if (!shells.find(s => s.value === shellPath)) {
+              shells.push({ name: shell.name, value: shellPath });
+            }
+            break; // Found this shell, move to next
+          }
+        } catch (e) {
+          // Ignore errors and continue
+        }
       }
     }
-    
-    shells.push(...commonShells);
+
+    // Fallback: if no shells found, add system default or /bin/sh
+    if (shells.length === 0) {
+      const fallback = process.env.SHELL || '/bin/sh';
+      shells.push({ name: 'Default Shell', value: fallback });
+    }
   }
-  
+
   return shells;
 }
 

@@ -7,15 +7,7 @@ import { GroupModal } from './components/GroupModal';
 import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
 
 export function App() {
-    console.log('App component rendering...');
-
     const state = useAppState();
-    console.log('useAppState initialized:', {
-        projects: state.projects?.length,
-        groups: state.groups?.length,
-        processes: state.processes?.size
-    });
-
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingGroup, setEditingGroup] = useState(null);
     const [isShortcutsModalOpen, setIsShortcutsModalOpen] = useState(false);
@@ -75,8 +67,6 @@ export function App() {
 
     // Initialize keyboard shortcuts
     useKeyboardShortcuts(shortcutHandlers);
-
-    console.log('About to render JSX...');
 
     return (
         <div className="flex h-screen">

@@ -3,7 +3,7 @@ const processesService = require('../services/processesService');
 
 ipcMain.handle('process:run', async (_event, { projectPath, scriptName, projectName, shell }) => {
   const mainWindow = BrowserWindow.getAllWindows()[0];
-  
+
   const onLog = (id, type, data) => {
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send('process:log', { id, type, data });

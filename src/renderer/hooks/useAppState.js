@@ -11,6 +11,7 @@ export function useAppState() {
     const [availableShells, setAvailableShells] = useState([]);
     const [selectedShell, setSelectedShell] = useState(null);
     const [favorites, setFavorites] = useState([]);
+    const [shellsLoading, setShellsLoading] = useState(true);
 
     // Load initial data
     useEffect(() => {
@@ -47,10 +48,20 @@ export function useAppState() {
     }, []);
 
     const loadShells = useCallback(async () => {
-        const shells = await window.irisucAPI.getAvailableShells();
-        const selected = await window.irisucAPI.getShellPreference();
-        setAvailableShells(shells);
-        setSelectedShell(selected);
+        setShellsLoading(true);
+        try {
+            const shells = await window.irisucAPI.getAvailableShells();
+            const selected = await window.irisucAPI.getShellPreference();
+            setAvailableShells(shells || []);
+            setSelectedShell(selected);
+        } catch (error) {
+            console.error('Error loading shells:', error);
+            // Set a fallback shell if loading fails
+            setAvailableShells([{ name: 'Default Shell', value: '/bin/bash' }]);
+            setSelectedShell('/bin/bash');
+        } finally {
+            setShellsLoading(false);
+        }
     }, []);
 
     const loadFavorites = useCallback(async () => {
@@ -74,6 +85,9 @@ export function useAppState() {
         const result = await window.irisucAPI.addProject();
         if (result.success) {
             await loadProjects();
+        } else {
+            // Show error to user
+            alert(`Failed to add project: ${result.error || 'Unknown error'}`);
         }
         return result;
     }, [loadProjects]);
@@ -248,11 +262,13 @@ export function useAppState() {
         searchQuery,
         availableShells,
         selectedShell,
+        shellsLoading,
         setSearchQuery,
         setActiveProcessId,
         setShell,
         toggleGroupCollapsed,
         addProject,
+        loadProjects,
         removeProject,
         updateProjectGroup,
         createGroup,

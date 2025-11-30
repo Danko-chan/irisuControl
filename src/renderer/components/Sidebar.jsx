@@ -25,19 +25,40 @@ export function Sidebar({ state, onOpenGroupModal, searchInputRef, onShowShortcu
         const items = e.dataTransfer.items;
         if (!items) return;
 
+        let addedCount = 0;
+        let errors = [];
+
         for (let i = 0; i < items.length; i++) {
             const item = items[i];
             if (item.kind === 'file') {
                 const entry = item.webkitGetAsEntry();
                 if (entry && entry.isDirectory) {
-                    const result = await window.irisucAPI.addProjectByPath(entry.fullPath);
-                    if (result.success) {
-                        console.log('Project added:', entry.fullPath);
-                    } else {
-                        console.error('Failed to add project:', result.error);
+                    try {
+                        const result = await window.irisucAPI.addProjectByPath(entry.fullPath);
+                        if (result.success) {
+                            console.log('Project added:', entry.fullPath);
+                            addedCount++;
+                        } else {
+                            console.error('Failed to add project:', result.error);
+                            errors.push(`${entry.name}: ${result.error}`);
+                        }
+                    } catch (error) {
+                        console.error('Error adding project:', error);
+                        errors.push(`${entry.name}: ${error.message}`);
                     }
                 }
             }
+        }
+
+        // Reload projects if any were added
+        if (addedCount > 0) {
+            // Reload projects from state
+            await state.loadProjects();
+        }
+
+        // Show errors if any
+        if (errors.length > 0) {
+            alert(`Failed to add some projects:\n${errors.join('\n')}`);
         }
     };
 
@@ -139,8 +160,10 @@ export function Sidebar({ state, onOpenGroupModal, searchInputRef, onShowShortcu
                     onChange={handleShellChange}
                     className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-md text-text-primary text-xs cursor-pointer hover:border-primary focus:outline-none focus:border-primary focus:bg-bg-dark transition-all"
                 >
-                    {state.availableShells.length === 0 ? (
+                    {state.shellsLoading ? (
                         <option value="">Loading...</option>
+                    ) : state.availableShells.length === 0 ? (
+                        <option value="/bin/bash">Default Shell</option>
                     ) : (
                         state.availableShells.map(shell => (
                             <option key={shell.value} value={shell.value}>{shell.name}</option>
@@ -198,6 +221,8 @@ export function Sidebar({ state, onOpenGroupModal, searchInputRef, onShowShortcu
                         onUpdateProjectGroup={state.updateProjectGroup}
                         onRemoveProject={state.removeProject}
                         onRunScript={state.runScript}
+                        onToggleFavorite={state.toggleFavorite}
+                        isFavorite={state.isFavorite}
                     />
                 )}
             </div>
