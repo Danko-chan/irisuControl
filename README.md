@@ -132,33 +132,6 @@ Generated files are placed in the `release/` directory.
 
 ---
 
-## Project Structure
-
-```
-irisuControl/
-├── src/
-│   ├── main/              # Electron main process
-│   │   ├── main.js        # App entry point
-│   │   └── ipc/           # IPC handlers
-│   │       ├── projects-ipc.js
-│   │       ├── processes-ipc.js
-│   │       └── logs-ipc.js
-│   ├── preload/           # Preload scripts
-│   │   └── preload.js     # Context bridge API
-│   └── renderer/          # UI and frontend
-│       ├── App.jsx        # Main app component
-│       ├── main.jsx       # Renderer entry point
-│       ├── components/    # React components
-│       ├── hooks/         # Custom hooks
-│       └── styles/        # CSS styles
-├── resources/
-│   └── icons/             # App icons
-├── package.json
-└── vite.config.js         # Vite configuration
-```
-
----
-
 ## Contributing
 
 Contributions, ideas, and issue reports are welcome!
