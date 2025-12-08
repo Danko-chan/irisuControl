@@ -1,6 +1,6 @@
 {
   "name": "irisu-control",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Multi-project npm script runner with grouping",
   "main": "src/main/main.js",
   "scripts": {
